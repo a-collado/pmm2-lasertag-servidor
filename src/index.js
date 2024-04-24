@@ -1,4 +1,3 @@
-// importamos las librerías requeridas
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
@@ -22,12 +21,23 @@ wsServer.on("request", (request) => {
   const connection = request.accept(null, request.origin);
   connection.on("message", (message) => {
     console.log("Mensaje recibido: " + message.utf8Data);
-    wsServer.connections.forEach(function each(client) {
-      //TODO Aqui se podria hacer que en vez de enviar el mensaje a secas,
-      //se en envie un JSON, en el que haya un type o algo asi que indique
-      //que tipo de mensaje es.
-      client.sendUTF(message.utf8Data);
-    });
+    let m = JSON.parse(message.utf8Data);
+
+    // Reenviamos los mensajes enviados por el servidor al cliente.
+    if (m["sender"] === "server") {
+      wsServer.connections.forEach(function each(client) {
+        client.sendUTF(message.utf8Data);
+      });
+    } else {
+      switch (m["type"]) {
+        case "start":
+          clearInterval(requestLoop);
+          break;
+
+        default:
+          break;
+      }
+    }
   });
   connection.on("close", (reasonCode, description) => {
     console.log("El cliente se desconecto");
@@ -70,16 +80,21 @@ var connectedDevices = [];
 mqttClient.on("message", (topic, payload) => {
   console.log("Mensaje MQTT Recibido:", topic, payload.toString());
   connectedDevices.push(payload.toString());
-  //ws.send(payload.toString());
 });
 
-var requestLoop = setInterval(function () {
+var requestLoop = setInterval(checkConnectionDevices, RECONNECTION_TIME);
+
+function checkConnectionDevices() {
   mqttClient.publish(connectTopic, "Connect");
   setTimeout(setConnectedDevices, RECONNECTION_TIME / 2);
-}, RECONNECTION_TIME);
+}
 
 function setConnectedDevices() {
-  ws.send(JSON.stringify(connectedDevices));
+  let message = {};
+  message["type"] = "devices";
+  message["sender"] = "server";
+  message["content"] = connectedDevices;
+  ws.send(JSON.stringify(message));
   connectedDevices = [];
 }
 
@@ -87,3 +102,5 @@ function setConnectedDevices() {
 server.listen(app.get("port"), () => {
   console.log("Servidor iniciado en el puerto: " + app.get("port"));
 });
+
+exports.requestLoop = requestLoop;

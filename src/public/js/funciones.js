@@ -1,13 +1,3 @@
-function enviarTexto(event) {
-  event.preventDefault();
-  event.stopPropagation();
-
-  var campo = event.target.texto;
-
-  doSend(campo.value);
-  campo.value = "";
-}
-
 function init() {
   wsConnect();
 }
@@ -42,7 +32,10 @@ function onClose(evt) {
 
 function onMessage(evt) {
   let data = JSON.parse(evt.data);
-  updateDevices(data);
+
+  if (data["type"] === "devices") {
+    updateDevices(data["content"]);
+  }
 }
 
 function updateDevices(devices) {
@@ -62,6 +55,13 @@ function onError(evt) {
 
 function doSend(mensaje) {
   websocket.send(mensaje);
+}
+
+function startGame() {
+  let message = {};
+  message["type"] = "start";
+  message["sender"] = "client";
+  doSend(JSON.stringify(message));
 }
 
 window.addEventListener("load", init, false);
