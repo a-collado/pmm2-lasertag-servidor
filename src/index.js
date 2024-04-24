@@ -26,7 +26,10 @@ wsServer.on("request", (request) => {
     // Reenviamos los mensajes enviados por el servidor al cliente.
     if (m["sender"] === "server") {
       wsServer.connections.forEach(function each(client) {
-        client.sendUTF(message.utf8Data);
+        // WARNING: Esta linea (if) podria estar mal, hay que tenerla en cuenta
+        if (client !== connection) {
+          client.sendUTF(message.utf8Data);
+        }
       });
     } else {
       switch (m["type"]) {
@@ -82,6 +85,7 @@ mqttClient.on("message", (topic, payload) => {
   connectedDevices.push(payload.toString());
 });
 
+// TODO: Hay que ver como reanudar el setInverval en casa de que lo paremos.
 var requestLoop = setInterval(checkConnectionDevices, RECONNECTION_TIME);
 
 function checkConnectionDevices() {
@@ -102,5 +106,3 @@ function setConnectedDevices() {
 server.listen(app.get("port"), () => {
   console.log("Servidor iniciado en el puerto: " + app.get("port"));
 });
-
-exports.requestLoop = requestLoop;
