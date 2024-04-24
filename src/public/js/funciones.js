@@ -33,7 +33,7 @@ function onOpen(evt) {
 }
 
 function onClose(evt) {
-  document.getElementById("mensajes").innerHTML = "";
+  document.getElementById("devices").innerHTML = "";
 
   setTimeout(function () {
     wsConnect();
@@ -41,11 +41,15 @@ function onClose(evt) {
 }
 
 function onMessage(evt) {
-  let list = document.getElementById("devices");
   let data = JSON.parse(evt.data);
+  updateDevices(data);
+}
+
+function updateDevices(devices) {
+  let list = document.getElementById("devices");
 
   list.innerHTML = "";
-  data.forEach((element) => {
+  devices.forEach((element) => {
     let li = document.createElement("li");
     li.innerText = element;
     list.appendChild(li);
