@@ -12,10 +12,29 @@ const wsServer = new WebSocketServer({
   autoAcceptConnections: false,
 });
 
+// Tiempo en ms que entre comprobaciones de conexion
+const RECONNECTION_TIME = 10000;
+
+var connectedDevices = [];
+var requestLoop;
+var setting_teams = false;
+
+if (!setting_teams) {
+  setRequestLoop();
+}
+
 app.set("port", 3000);
 app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "./public")));
+app.set("view engine", "ejs");
+app.use(express.static(path.join(__dirname, "./public/")));
+app.set("views", path.join(__dirname, "./public/views/"));
+
+app.get("/", (req, res) => {
+  const data = {
+    setting_teams: setting_teams,
+  };
+  res.render("index", data);
+});
 
 wsServer.on("request", (request) => {
   const connection = request.accept(null, request.origin);
@@ -33,10 +52,14 @@ wsServer.on("request", (request) => {
       });
     } else {
       switch (m["type"]) {
-        case "start":
+        case "teamSelect":
           clearInterval(requestLoop);
+          setting_teams = true;
           break;
-
+        case "devicesScreen":
+          setRequestLoop();
+          setting_teams = false;
+          break;
         default:
           break;
       }
@@ -46,6 +69,15 @@ wsServer.on("request", (request) => {
     console.log("El cliente se desconecto");
   });
 });
+
+function setConnectedDevices() {
+  let message = {};
+  message["type"] = "devices";
+  message["sender"] = "server";
+  message["content"] = connectedDevices;
+  ws.send(JSON.stringify(message));
+  connectedDevices = [];
+}
 
 // Aqui empieza la parte de MQTT
 
@@ -59,9 +91,6 @@ const connectUrl = protocol + "://" + host + ":" + port;
 
 const connectTopic = "Connections/Connect";
 const reconnectTopic = "Connections/Reconnect";
-
-// Tiempo en ms que entre comprobaciones de conexion
-const RECONNECTION_TIME = 10000;
 
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
@@ -78,28 +107,18 @@ mqttClient.on("connect", () => {
   });
 });
 
-var connectedDevices = [];
-
 mqttClient.on("message", (topic, payload) => {
   console.log("Mensaje MQTT Recibido:", topic, payload.toString());
   connectedDevices.push(payload.toString());
 });
 
-// TODO: Hay que ver como reanudar el setInverval en casa de que lo paremos.
-var requestLoop = setInterval(checkConnectionDevices, RECONNECTION_TIME);
+function setRequestLoop() {
+  requestLoop = setInterval(checkConnectionDevices, RECONNECTION_TIME);
+}
 
 function checkConnectionDevices() {
   mqttClient.publish(connectTopic, "Connect");
   setTimeout(setConnectedDevices, RECONNECTION_TIME / 2);
-}
-
-function setConnectedDevices() {
-  let message = {};
-  message["type"] = "devices";
-  message["sender"] = "server";
-  message["content"] = connectedDevices;
-  ws.send(JSON.stringify(message));
-  connectedDevices = [];
 }
 
 // Iniciamos el servidor en el puerto establecido por la variable port (3000)

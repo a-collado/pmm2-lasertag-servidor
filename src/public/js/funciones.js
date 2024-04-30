@@ -4,9 +4,9 @@ function init() {
 
 function wsConnect() {
   websocket = new WebSocket("ws://10.3.141.1:3000");
-  //websocket.onopen = function (evt) {
-  //  onOpen(evt);
-  //};
+  websocket.onopen = function (evt) {
+    //  onOpen(evt);
+  };
   websocket.onclose = function (evt) {
     onClose(evt);
   };
@@ -16,10 +16,6 @@ function wsConnect() {
   websocket.onerror = function (evt) {
     onError(evt);
   };
-}
-
-function onOpen(evt) {
-  doSend("saludos del cliente websocket");
 }
 
 function onClose(evt) {
@@ -40,7 +36,6 @@ function onMessage(evt) {
 
 function updateDevices(devices) {
   let list = document.getElementById("devices");
-
   list.innerHTML = "";
   devices.forEach((element) => {
     let li = document.createElement("li");
@@ -57,11 +52,20 @@ function doSend(mensaje) {
   websocket.send(mensaje);
 }
 
-function startGame() {
+function selectTeams() {
   let message = {};
-  message["type"] = "start";
+  message["type"] = "teamSelect";
   message["sender"] = "client";
   doSend(JSON.stringify(message));
+  location.reload();
+}
+
+function goToDevices() {
+  let message = {};
+  message["type"] = "devicesScreen";
+  message["sender"] = "client";
+  doSend(JSON.stringify(message));
+  location.reload();
 }
 
 window.addEventListener("load", init, false);
