@@ -37,9 +37,9 @@ function onMessage(evt) {
       break;
     case "redirect":
       let m = data["content"];
-      console.log(m);
       switch (m["destination"]) {
         case "teamSelect":
+          setTeamSelect(m["devices"]);
           break;
         case "devicesScreen":
           updateDevices(m["devices"]);
@@ -58,6 +58,28 @@ function updateDevices(devices) {
   devices.forEach((element) => {
     let li = document.createElement("li");
     li.innerText = element;
+    list.appendChild(li);
+  });
+}
+
+function setTeamSelect(devices) {
+  let list = document.getElementById("devices_teams");
+
+  list.innerHTML = "";
+
+  devices.forEach((element) => {
+    let li = document.createElement("li");
+
+    li.innerHTML = `
+    <span>${element}</span>
+    <div class="team-selector">
+      <input type="radio" name="team-${element}" value="team1" id="team1-${element}" checked>
+      <label for="team1-${element}">Team 1</label>
+      <input type="radio" name="team-${element}" value="team2" id="team2-${element}">
+      <label for="team2-${element}">Team 2</label>
+    </div>
+    `;
+
     list.appendChild(li);
   });
 }
@@ -91,6 +113,41 @@ function fetchState() {
   message["type"] = "fetch";
   message["sender"] = "client";
   doSend(JSON.stringify(message));
+}
+
+function goToScoreboard() {
+  let message = {};
+  message["type"] = "redirect";
+  message["content"] = "scoreboard";
+  message["sender"] = "client";
+  doSend(JSON.stringify(message));
+}
+
+function setTeams() {
+  let listItems = document.querySelectorAll(
+    "#devices_teams input[id^='team1-']",
+  );
+  let teams = [];
+
+  listItems.forEach((li) => {
+    let player = {};
+    player["name"] = li.name.split("-")[1].trim();
+    if (li.checked) {
+      player["team"] = 1;
+    } else {
+      player["team"] = 2;
+    }
+    teams.push(player);
+  });
+
+  let message = {};
+
+  message["type"] = "teams";
+  message["sender"] = "client";
+  message["content"] = teams;
+
+  doSend(JSON.stringify(message));
+  goToScoreboard();
 }
 
 window.addEventListener("load", init, false);

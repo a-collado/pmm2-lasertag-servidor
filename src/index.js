@@ -12,15 +12,21 @@ const wsServer = new WebSocketServer({
   autoAcceptConnections: false,
 });
 
+const STATES = {
+  CONNECTING: "connecting",
+  TEAMS: "teams",
+  SCOREBOARD: "scoreboard",
+};
 // Tiempo en ms que entre comprobaciones de conexion
 const RECONNECTION_TIME = 10000;
 
 var connectedDevices = [];
 var devices = [];
 var requestLoop;
-var setting_teams = false;
+var current_state = STATES.CONNECTING;
+var scoreboard = [];
 
-if (!setting_teams) {
+if (current_state === STATES.CONNECTING) {
   setRequestLoop();
 } else {
   clearInterval(requestLoop);
@@ -34,7 +40,7 @@ app.set("views", path.join(__dirname, "./public/views/"));
 
 app.get("/", (req, res) => {
   const data = {
-    setting_teams: setting_teams,
+    current_state: current_state,
   };
   res.render("index", data);
 });
@@ -48,21 +54,24 @@ wsServer.on("request", (request) => {
     // Reenviamos los mensajes enviados por el servidor al cliente.
     if (m["sender"] === "server") {
       wsServer.connections.forEach(function each(client) {
-        // WARNING: Esta linea (if) podria estar mal, hay que tenerla en cuenta
         if (client !== connection) {
           client.sendUTF(message.utf8Data);
         }
       });
     } else {
+      scoreboard = [];
       if (m["type"] === "redirect") {
         switch (m["content"]) {
           case "teamSelect":
             clearInterval(requestLoop);
-            setting_teams = true;
+            current_state = STATES.TEAMS;
             break;
           case "devicesScreen":
             setRequestLoop();
-            setting_teams = false;
+            current_state = STATES.CONNECTING;
+            break;
+          case "scoreboard":
+            current_state = STATES.SCOREBOARD;
             break;
           default:
             break;
@@ -70,11 +79,32 @@ wsServer.on("request", (request) => {
         reloadClient();
       }
       if (m["type"] === "fetch") {
-        if (setting_teams) {
-          redirectClient("teamSelect");
-        } else {
-          redirectClient("devicesScreen");
+        switch (current_state) {
+          case STATES.TEAMS:
+            redirectClient("teamSelect");
+            break;
+          case STATES.CONNECTING:
+            redirectClient("devicesScreen");
+            break;
+          default:
+            break;
         }
+      }
+      if (m["type"] === "teams") {
+        let team_1 = [];
+        let team_2 = [];
+        console.log(m["content"]);
+        m["content"].forEach((element) => {
+          let p = { name: element["name"], kills: 0, deaths: 0 };
+          if (element["team"] === 1) {
+            team_1.push(p);
+          } else {
+            team_2.push(p);
+          }
+        });
+        scoreboard.push(team_1);
+        scoreboard.push(team_2);
+        console.log(scoreboard);
       }
     }
   });

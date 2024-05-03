@@ -3,18 +3,24 @@
     <head>
         <meta charset="utf-8">
         <title>Slayser Tag</title>
+        <link href="/favicon.ico" rel="icon" type="image/x-icon">
     </head>
     <body>
         <main> 
-            <% if (setting_teams) { %>
+            <% if (current_state === "teams") { %>
                 <h1>Elegir equipos:</h1>
                 <ul id="devices_teams"></ul>
-                <button type="button" onclick="">Start Game</button>
+                <button type="button" onclick="setTeams()">Quick Play</button>
+                <button type="button" onclick="setTeams()">Configure Game</button>
                 <button type="button" onclick="goToDevices()">Go Back</button>
-            <% } else { %>
+            <% } if (current_state === "connecting") { %>
                 <h1>Dispositivos conectados:</h1>
                 <ul id="devices_connecting"></ul>
-                <button type="button" onclick="selectTeams()">Start Game</button>
+                <button type="button" onclick="selectTeams()">Select Teams</button>
+                <button type="button" onclick="">Free for all</button>
+            <% } if (current_state === "scoreboard") { %>
+                <h1>Puntuaciones:</h1>
+                <button type="button" onclick="">Stop Game</button>
             <% } %>
         </main>
         <script type="text/javascript" src="/js/funciones.js"></script>
