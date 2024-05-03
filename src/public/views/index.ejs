@@ -19,8 +19,26 @@
                 <button type="button" onclick="selectTeams()">Select Teams</button>
                 <button type="button" onclick="">Free for all</button>
             <% } if (current_state === "scoreboard") { %>
-                <h1>Puntuaciones:</h1>
-                <button type="button" onclick="">Stop Game</button>
+                <h1>Puntuaciones:</h1> 
+                <div>
+                <h3>Team 1</h3>
+                    <table id="scoreboad_team_1">
+                        <tr>
+                            <th>Name</th>
+                            <th>Kills</th>
+                            <th>Deaths</th>
+                        </tr>
+                    </table>
+                    <h3>Team 2</h3>
+                    <table id="scoreboad_team_2">
+                        <tr>
+                            <th>Name</th>
+                            <th>Kills</th>
+                            <th>Deaths</th>
+                        </tr>
+                    </table>
+                </div>
+            <button type="button" onclick="">Stop Game</button>
             <% } %>
         </main>
         <script type="text/javascript" src="/js/funciones.js"></script>

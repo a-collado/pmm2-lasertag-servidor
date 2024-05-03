@@ -59,7 +59,6 @@ wsServer.on("request", (request) => {
         }
       });
     } else {
-      scoreboard = [];
       if (m["type"] === "redirect") {
         switch (m["content"]) {
           case "teamSelect":
@@ -86,11 +85,22 @@ wsServer.on("request", (request) => {
           case STATES.CONNECTING:
             redirectClient("devicesScreen");
             break;
+          case STATES.SCOREBOARD:
+            let message = {};
+            message["type"] = "redirect";
+            message["sender"] = "server";
+            let content = {};
+            content["destination"] = "scoreboard";
+            content["score"] = scoreboard;
+            message["content"] = content;
+            ws.send(JSON.stringify(message));
+            break;
           default:
             break;
         }
       }
       if (m["type"] === "teams") {
+        scoreboard = [];
         let team_1 = [];
         let team_2 = [];
         console.log(m["content"]);
@@ -104,7 +114,6 @@ wsServer.on("request", (request) => {
         });
         scoreboard.push(team_1);
         scoreboard.push(team_2);
-        console.log(scoreboard);
       }
     }
   });
