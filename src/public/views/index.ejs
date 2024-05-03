@@ -8,12 +8,12 @@
         <main> 
             <% if (setting_teams) { %>
                 <h1>Elegir equipos:</h1>
-                <ul id="devices"></ul>
+                <ul id="devices_teams"></ul>
                 <button type="button" onclick="">Start Game</button>
                 <button type="button" onclick="goToDevices()">Go Back</button>
             <% } else { %>
                 <h1>Dispositivos conectados:</h1>
-                <ul id="devices"></ul>
+                <ul id="devices_connecting"></ul>
                 <button type="button" onclick="selectTeams()">Start Game</button>
             <% } %>
         </main>

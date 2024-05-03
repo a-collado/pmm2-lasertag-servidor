@@ -16,11 +16,14 @@ const wsServer = new WebSocketServer({
 const RECONNECTION_TIME = 10000;
 
 var connectedDevices = [];
+var devices = [];
 var requestLoop;
 var setting_teams = false;
 
 if (!setting_teams) {
   setRequestLoop();
+} else {
+  clearInterval(requestLoop);
 }
 
 app.set("port", 3000);
@@ -51,17 +54,27 @@ wsServer.on("request", (request) => {
         }
       });
     } else {
-      switch (m["type"]) {
-        case "teamSelect":
-          clearInterval(requestLoop);
-          setting_teams = true;
-          break;
-        case "devicesScreen":
-          setRequestLoop();
-          setting_teams = false;
-          break;
-        default:
-          break;
+      if (m["type"] === "redirect") {
+        switch (m["content"]) {
+          case "teamSelect":
+            clearInterval(requestLoop);
+            setting_teams = true;
+            break;
+          case "devicesScreen":
+            setRequestLoop();
+            setting_teams = false;
+            break;
+          default:
+            break;
+        }
+        reloadClient();
+      }
+      if (m["type"] === "fetch") {
+        if (setting_teams) {
+          redirectClient("teamSelect");
+        } else {
+          redirectClient("devicesScreen");
+        }
       }
     }
   });
@@ -70,12 +83,31 @@ wsServer.on("request", (request) => {
   });
 });
 
+function reloadClient() {
+  let message_r = {};
+  message_r["type"] = "reload";
+  message_r["sender"] = "server";
+  ws.send(JSON.stringify(message_r));
+}
+
+function redirectClient(destination) {
+  let message = {};
+  message["type"] = "redirect";
+  message["sender"] = "server";
+  let content = {};
+  content["destination"] = destination;
+  content["devices"] = devices;
+  message["content"] = content;
+  ws.send(JSON.stringify(message));
+}
+
 function setConnectedDevices() {
   let message = {};
   message["type"] = "devices";
   message["sender"] = "server";
   message["content"] = connectedDevices;
   ws.send(JSON.stringify(message));
+  devices = connectedDevices;
   connectedDevices = [];
 }
 
