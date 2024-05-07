@@ -19,8 +19,6 @@ function wsConnect() {
 }
 
 function onClose(evt) {
-  //document.getElementById("devices_connecting").innerHTML = "";
-
   setTimeout(function () {
     wsConnect();
   }, 2000);
@@ -47,6 +45,8 @@ function onMessage(evt) {
         case "scoreboard":
           createScore(m["score"]);
           break;
+        case "settings":
+          break;
         default:
           break;
       }
@@ -58,6 +58,55 @@ function onMessage(evt) {
     default:
       break;
   }
+}
+
+function saveSettings(){
+  let selectedGameMode = document.querySelector('input[name="gameMode"]:checked').value;
+  let selectedTime = document.querySelector('input[name="time"]:checked').value;
+  let selectedLifes = document.querySelector('input[name="life"]:checked').value;
+
+  let time = 10;
+  switch (selectedTime) {
+    case "time_5":
+      time = 5
+      break;
+    case "time_10":
+      time = 10;
+      break;
+    case "time_15":
+      time = 15;
+      break;
+    default:
+      time = 10;
+      break;
+  }
+
+  let lifes = 8;
+  switch (selectedLifes) {
+    case "lifes_3":
+      lifes = 5
+      break;
+    case "lifes_8":
+      lifes = 10;
+      break;
+    case "lifes_13":
+      lifes = 15;
+      break;
+    default:
+      lifes = 10;
+      break;
+  }
+  let settings = {
+    mode: selectedGameMode,
+    time: time,
+    lives: lifes,
+  }
+  let message = {};
+  message["type"] = "settings";
+  message["content"] = settings;
+  message["sender"] = "client";
+  doSend(JSON.stringify(message));
+  goToScoreboard();
 }
 
 function updateDevices(devices) {
@@ -180,6 +229,15 @@ function goToScoreboard() {
   doSend(JSON.stringify(message));
 }
 
+function goToSettings() {
+  setTeams();
+  let message = {};
+  message["type"] = "redirect";
+  message["content"] = "settings";
+  message["sender"] = "client";
+  doSend(JSON.stringify(message));
+}
+
 function setTeams() {
   let listItems = document.querySelectorAll(
     "#devices_teams input[id^='team1-']",
@@ -204,6 +262,11 @@ function setTeams() {
   message["content"] = teams;
 
   doSend(JSON.stringify(message));
+  goToScoreboard();
+}
+
+function setTeamsToScoreboard() {
+  setTeams();
   goToScoreboard();
 }
 

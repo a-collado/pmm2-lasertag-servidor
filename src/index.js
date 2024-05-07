@@ -16,6 +16,9 @@ const STATES = {
   CONNECTING: "connecting",
   TEAMS: "teams",
   SCOREBOARD: "scoreboard",
+  SETTINGS: "settings",
+  WAIT: "wait",
+
 };
 // Tiempo en ms que entre comprobaciones de conexion
 const RECONNECTION_TIME = 10000;
@@ -25,6 +28,12 @@ var devices = [];
 var requestLoop;
 var current_state = STATES.CONNECTING;
 var scoreboard = [];
+var rules_default = {
+  mode: "time",
+  time: 10,
+  lives: 10,
+};
+var rules = rules_default;
 
 if (current_state === STATES.CONNECTING) {
   setRequestLoop();
@@ -72,6 +81,8 @@ wsServer.on("request", (request) => {
           case "scoreboard":
             current_state = STATES.SCOREBOARD;
             break;
+          case "settings":
+            current_state = STATES.SETTINGS;
           default:
             break;
         }
@@ -114,6 +125,10 @@ wsServer.on("request", (request) => {
         });
         scoreboard.push(team_1);
         scoreboard.push(team_2);
+      }
+      if (m["type"] === "settings"){
+        rules = m["content"];
+
       }
     }
   });
@@ -200,6 +215,7 @@ mqttClient.on("message", (topic, payload) => {
     case hitTopic:
       if (current_state == STATES.SCOREBOARD) {
         registerHitTeams(JSON.parse(payload.toString()));
+        // TODO: Aqui habra que poner que se apliquen las reglas.
       }
       break;
     default:
