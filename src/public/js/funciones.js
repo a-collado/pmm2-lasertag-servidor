@@ -45,11 +45,16 @@ function onMessage(evt) {
           updateDevices(m["devices"]);
           break;
         case "scoreboard":
-          updateScore(m["score"]);
+          createScore(m["score"]);
           break;
         default:
           break;
       }
+      break;
+    case "scoreboard":
+      let score = data["content"];
+      updateScore(score);
+      break;
     default:
       break;
   }
@@ -87,46 +92,53 @@ function setTeamSelect(devices) {
   });
 }
 
+function createScore(score) {
+  let team_1 = score[0];
+  let team_2 = score[1];
+
+  let team_1_scoreboard = document.getElementById("scoreboad_team_1");
+  populateScore(team_1_scoreboard, team_1);
+
+  let team_2_scoreboard = document.getElementById("scoreboad_team_2");
+  populateScore(team_2_scoreboard, team_2);
+}
+
 function updateScore(score) {
   let team_1 = score[0];
   let team_2 = score[1];
 
   let team_1_scoreboard = document.getElementById("scoreboad_team_1");
-  team_1.forEach((element) => {
-    const newRow = team_1_scoreboard.insertRow();
-    const cell1 = newRow.insertCell();
-    const cell2 = newRow.insertCell();
-    const cell3 = newRow.insertCell();
-    cell1.innerHTML = element["name"];
-    cell2.textContent = element["kills"];
-    cell2.textContent = element["deaths"];
-  });
+  replaceScore(team_1_scoreboard, team_1);
 
   let team_2_scoreboard = document.getElementById("scoreboad_team_2");
-  team_2.forEach((element) => {
-    const newRow = team_2_scoreboard.insertRow();
+  replaceScore(team_2_scoreboard, team_2);
+}
+
+function replaceScore(scoreboard, score) {
+  for (let index = 0; index < score.length; index++) {
+    const newRow = scoreboard.rows[index + 1];
+    const cell1 = document.createElement("td");
+    const cell2 = document.createElement("td");
+    const cell3 = document.createElement("td");
+    cell1.textContent = score[index]["name"];
+    cell2.textContent = score[index]["kills"];
+    cell3.textContent = score[index]["deaths"];
+    newRow.replaceChild(cell1, newRow.cells[0]);
+    newRow.replaceChild(cell2, newRow.cells[1]);
+    newRow.replaceChild(cell3, newRow.cells[2]);
+  }
+}
+
+function populateScore(scoreboard, score) {
+  score.forEach((element) => {
+    const newRow = scoreboard.insertRow();
     const cell1 = newRow.insertCell();
     const cell2 = newRow.insertCell();
     const cell3 = newRow.insertCell();
     cell1.innerHTML = element["name"];
     cell2.textContent = element["kills"];
-    cell2.textContent = element["deaths"];
+    cell3.textContent = element["deaths"];
   });
-}
-
-function populateScore(element) {
-  let tr = document.createElement("tr");
-  let td_1 = document.createElement("td");
-  td_1.innerText = element["name"];
-  let td_2 = document.createElement("td");
-  td_2.innerText = element["kills"];
-  let td_3 = document.createElement("td");
-  td_3.innerText = element["deaths"];
-  tr.appendChild(td_1);
-  tr.appendChild(td_2);
-  tr.appendChild(td_3);
-
-  return tr;
 }
 
 function onError(evt) {

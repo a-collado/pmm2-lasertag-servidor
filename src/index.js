@@ -150,6 +150,14 @@ function setConnectedDevices() {
   connectedDevices = [];
 }
 
+function updateScoreboard() {
+  let message = {};
+  message["type"] = "scoreboard";
+  message["sender"] = "server";
+  message["content"] = scoreboard;
+  ws.send(JSON.stringify(message));
+}
+
 // Aqui empieza la parte de MQTT
 
 const ws = new WebSocket("ws://10.3.141.1:3000");
@@ -162,6 +170,7 @@ const connectUrl = protocol + "://" + host + ":" + port;
 
 const connectTopic = "Connections/Connect";
 const reconnectTopic = "Connections/Reconnect";
+const hitTopic = "Game/Hit";
 
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
@@ -176,11 +185,26 @@ mqttClient.on("connect", () => {
   mqttClient.subscribe([reconnectTopic], () => {
     console.log("Subscribe to topic " + reconnectTopic);
   });
+
+  mqttClient.subscribe([hitTopic], () => {
+    console.log("Subscribe to topic " + hitTopic);
+  });
 });
 
 mqttClient.on("message", (topic, payload) => {
   console.log("Mensaje MQTT Recibido:", topic, payload.toString());
-  connectedDevices.push(payload.toString());
+  switch (topic) {
+    case reconnectTopic:
+      connectedDevices.push(payload.toString());
+      break;
+    case hitTopic:
+      if (current_state == STATES.SCOREBOARD) {
+        registerHitTeams(JSON.parse(payload.toString()));
+      }
+      break;
+    default:
+      break;
+  }
 });
 
 function setRequestLoop() {
@@ -190,6 +214,34 @@ function setRequestLoop() {
 function checkConnectionDevices() {
   mqttClient.publish(connectTopic, "Connect");
   setTimeout(setConnectedDevices, RECONNECTION_TIME / 2);
+}
+
+function registerHitTeams(hitInformation) {
+  if (scoreboard.length === 0) {
+    return;
+  }
+  let from = hitInformation["chaleco"];
+  let to = hitInformation["pistola"];
+
+  let fromP = scoreboard[0].findIndex((player) => player.name === from);
+  let fromT = 0;
+  if (fromP === -1) {
+    fromP = scoreboard[1].findIndex((player) => player.name === from);
+    fromT = 1;
+  }
+
+  let toP = scoreboard[0].findIndex((player) => player.name === to);
+  let toT = 0;
+  if (toP === -1) {
+    toP = scoreboard[1].findIndex((player) => player.name === to);
+    toT = 1;
+  }
+
+  if (fromT !== toT) {
+    scoreboard[fromT][fromP].deaths += 1;
+    scoreboard[toT][toP].kills += 1;
+    updateScoreboard();
+  }
 }
 
 // Iniciamos el servidor en el puerto establecido por la variable port (3000)
