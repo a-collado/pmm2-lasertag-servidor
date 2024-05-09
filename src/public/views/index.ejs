@@ -5,19 +5,19 @@
         <title>Slayser Tag</title>
         <link href="/favicon.ico" rel="icon" type="image/x-icon">
     </head>
-    <body>
-        <main> 
+    <body style = "font-family: 'Courier New', monospace;">
+        <main class="container mt-4 d-flex flex-column" style="max-width: 900px;"> 
             <% if (current_state === "teams") { %>
                 <h1>Elegir equipos:</h1>
                 <ul id="devices_teams"></ul>
-                <button type="button" onclick="setTeamsToScoreboard()">Quick Play</button>
-                <button type="button" onclick="goToSettings()">Configure Game</button>
-                <button type="button" onclick="goToDevices()">Go Back</button>
+                <button type="button" class="btn btn-primary" onclick="setTeamsToScoreboard()">Quick Play</button>
+                <button type="button" class="btn btn-warning " onclick="goToSettings()">Configure Game</button>
+                <button type="button" class="btn btn-secondary " onclick="goToDevices()">Go Back</button>
             <% } if (current_state === "connecting") { %>
                 <h1>Dispositivos conectados:</h1>
-                <ul id="devices_connecting"></ul>
-                <button type="button" onclick="selectTeams()">Select Teams</button>
-                <button type="button" onclick="">Free for all</button>
+                <ul id="devices_connecting" class="list-group"></ul>
+                <button type="button" class="btn btn-primary" onclick="selectTeams()">Select Teams</button>
+                <button type="button" class="btn btn-primary" onclick="">Free for all</button>
             <% } if (current_state === "scoreboard") { %>
                 <h1>Puntuaciones:</h1> 
                 <div>
@@ -38,36 +38,48 @@
                         </tr>
                     </table>
                 </div>
-            <button type="button" onclick="">Stop Game</button>
+            <button type="button" class="btn btn-primary" onclick="">Stop Game</button>
             <% } if (current_state === "settings") { %>
-            <h1>Ajustes de la partida:</h1>
-            <fieldset>
-                <legend>Modo de juego:</legend>
-                <input type="radio" id="time" name="gameMode" value="time" checked>
-                <label for="time">Tiempo</label>
-                <input type="radio" id="lifes" name="gameMode" value="lifes">
-                <label for="lifes">Vidas</label>
+            <h1 class="my-4">Ajustes de la partida:</h1>
+            <fieldset class="card my-2">
+                <div class="card-body">
+                    <legend class="card-title">Modo de juego:</legend>
+                    <hr/>
+                    <input type="radio" class="form-check-input" id="time" name="gameMode" value="time" checked>
+                    <label for="time" class="me-2">Tiempo</label>
+                    <input type="radio" class="form-check-input" id="lifes" name="gameMode" value="lifes">
+                    <label for="lifes">Vidas</label>
+                </div>
+                
             </fieldset>
-            <fieldset id="time-options" style="display: block;">
-                <legend>Tiempo:</legend>
-                <input type="radio" id="time_5" name="time" value="time_5" checked>
-                <label for="time_5">5 minutos</label>
-                <input type="radio" id="time_10" name="time" value="time_10" checked>
-                <label for="time_10">10 minutos</label>
-                <input type="radio" id="time_15" name="time" value="time_15" checked>
-                <label for="time_15">15 minutos</label>
+            <fieldset class="card my-2" id="time-options" style="display: block;">
+                <div class="card-body">
+                    <legend class="card-title">Tiempo:</legend>
+                    <hr/>
+                    <input type="radio" class="form-check-input" id="time_5" name="time" value="time_5" checked>
+                    <label for="time_5" class="me-2">5 minutos</label>
+                    <input type="radio" class="form-check-input" id="time_10" name="time" value="time_10" checked>
+                    <label for="time_10" class="me-2">10 minutos</label>
+                    <input type="radio" class="form-check-input" id="time_15" name="time" value="time_15" checked>
+                    <label for="time_15" class="me-2">15 minutos</label>
+                </div>
+                
             </fieldset>
-            <fieldset id="lifes-options" style="display: none;">
-                <legend>Vidas:</legend>
-                <input type="radio" id="lifes_3" name="life" value="lifes_3" checked>
-                <label for="lifes_3">3 vidas</label>
-                <input type="radio" id="lifes_8" name="life" value="lifes_8" checked>
-                <label for="lifes_8">8 vidas</label>
-                <input type="radio" id="lifes_13" name="life" value="lifes_13" checked>
-                <label for="lifes_13">13 vidas</label>
+            <fieldset class="card my-2" id="lifes-options" style="display: none;">
+                <div class="card-body">
+                    <legend class="card-title">Vidas:</legend>
+                    <hr/>
+                    <input type="radio" class="form-check-input" id="lifes_3" name="life" value="lifes_3" checked>
+                    <label for="lifes_3" class="me-2">3 vidas</label>
+                    <input type="radio" class="form-check-input" id="lifes_8" name="life" value="lifes_8" checked>
+                    <label for="lifes_8" class="me-2">8 vidas</label>
+                    <input type="radio" class="form-check-input" id="lifes_13" name="life" value="lifes_13" checked>
+                    <label for="lifes_13" class="me-2">13 vidas</label>
+                </div>
+                
             </fieldset>
-            <button type="button" onclick="saveSettings()">Continue with this settings</button>
-            <button type="button" onclick="selectTeams()">Go Back</button>
+            <button type="button" class="btn btn-primary mt-2" onclick="saveSettings()">Continue with this settings</button>
+            <button type="button" class="btn btn-secondary my-1" onclick="selectTeams()">Go Back</button>
             <% } %>
         </main>
         <script>

@@ -3,7 +3,8 @@ function init() {
 }
 
 function wsConnect() {
-  websocket = new WebSocket("ws://10.3.141.1:3000");
+  //websocket = new WebSocket("ws://10.3.141.1:3000");
+  websocket = new WebSocket("ws://localhost:3000");
   websocket.onopen = function (evt) {
     fetchState();
   };
@@ -116,6 +117,7 @@ function updateDevices(devices) {
     let li = document.createElement("li");
     li.innerText = element;
     list.appendChild(li);
+    li.classList.add("list-group-item");
   });
 }
 
