@@ -175,7 +175,8 @@ function updateScoreboard() {
 
 // Aqui empieza la parte de MQTT
 
-const ws = new WebSocket("ws://10.3.141.1:3000");
+//const ws = new WebSocket("ws://10.3.141.1:3000");
+const ws = new WebSocket("ws://localhost:3000");
 const protocol = "mqtt";
 const host = "localhost";
 const port = "1883";

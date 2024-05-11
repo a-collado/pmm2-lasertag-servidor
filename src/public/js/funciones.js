@@ -3,7 +3,8 @@ function init() {
 }
 
 function wsConnect() {
-  websocket = new WebSocket("ws://10.3.141.1:3000");
+  //websocket = new WebSocket("ws://10.3.141.1:3000");
+  websocket = new WebSocket("ws://localhost:3000");
   websocket.onopen = function (evt) {
     fetchState();
   };
@@ -116,6 +117,7 @@ function updateDevices(devices) {
     let li = document.createElement("li");
     li.innerText = element;
     list.appendChild(li);
+    li.classList.add("list-group-item");
   });
 }
 
@@ -130,9 +132,9 @@ function setTeamSelect(devices) {
     li.innerHTML = `
     <span>${element}</span>
     <div class="team-selector">
-      <input type="radio" name="team-${element}" value="team1" id="team1-${element}" checked>
+      <input type="radio" name="team-${element}" class="form-check-input" value="team1" id="team1-${element}" checked>
       <label for="team1-${element}">Team 1</label>
-      <input type="radio" name="team-${element}" value="team2" id="team2-${element}">
+      <input type="radio" name="team-${element}" class="form-check-input" value="team2" id="team2-${element}">
       <label for="team2-${element}">Team 2</label>
     </div>
     `;
