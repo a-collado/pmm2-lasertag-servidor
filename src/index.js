@@ -1,3 +1,4 @@
+require("dotenv").config();
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
@@ -18,7 +19,6 @@ const STATES = {
   SCOREBOARD: "scoreboard",
   SETTINGS: "settings",
   WAIT: "wait",
-
 };
 // Tiempo en ms que entre comprobaciones de conexion
 const RECONNECTION_TIME = 10000;
@@ -34,6 +34,7 @@ var rules_default = {
   lives: 10,
 };
 var rules = rules_default;
+var ws_ip = "ws://" + process.env.IP + ":" + process.env.PORT;
 
 if (current_state === STATES.CONNECTING) {
   setRequestLoop();
@@ -41,7 +42,7 @@ if (current_state === STATES.CONNECTING) {
   clearInterval(requestLoop);
 }
 
-app.set("port", 3000);
+app.set("port", process.env.PORT);
 app.use(cors());
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "./public/")));
@@ -50,6 +51,7 @@ app.set("views", path.join(__dirname, "./public/views/"));
 app.get("/", (req, res) => {
   const data = {
     current_state: current_state,
+    ws_ip: ws_ip,
   };
   res.render("index", data);
 });
@@ -126,9 +128,8 @@ wsServer.on("request", (request) => {
         scoreboard.push(team_1);
         scoreboard.push(team_2);
       }
-      if (m["type"] === "settings"){
+      if (m["type"] === "settings") {
         rules = m["content"];
-
       }
     }
   });
@@ -175,8 +176,7 @@ function updateScoreboard() {
 
 // Aqui empieza la parte de MQTT
 
-//const ws = new WebSocket("ws://10.3.141.1:3000");
-const ws = new WebSocket("ws://localhost:3000");
+const ws = new WebSocket(ws_ip);
 const protocol = "mqtt";
 const host = "localhost";
 const port = "1883";

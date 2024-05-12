@@ -1,10 +1,12 @@
+const wsIPDiv = document.getElementById("ws-ip");
+const ws_ip = wsIPDiv.dataset.myString;
+
 function init() {
   wsConnect();
 }
 
 function wsConnect() {
-  //websocket = new WebSocket("ws://10.3.141.1:3000");
-  websocket = new WebSocket("ws://localhost:3000");
+  websocket = new WebSocket(ws_ip);
   websocket.onopen = function (evt) {
     fetchState();
   };
@@ -61,15 +63,19 @@ function onMessage(evt) {
   }
 }
 
-function saveSettings(){
-  let selectedGameMode = document.querySelector('input[name="gameMode"]:checked').value;
+function saveSettings() {
+  let selectedGameMode = document.querySelector(
+    'input[name="gameMode"]:checked',
+  ).value;
   let selectedTime = document.querySelector('input[name="time"]:checked').value;
-  let selectedLifes = document.querySelector('input[name="life"]:checked').value;
+  let selectedLifes = document.querySelector(
+    'input[name="life"]:checked',
+  ).value;
 
   let time = 10;
   switch (selectedTime) {
     case "time_5":
-      time = 5
+      time = 5;
       break;
     case "time_10":
       time = 10;
@@ -85,7 +91,7 @@ function saveSettings(){
   let lifes = 8;
   switch (selectedLifes) {
     case "lifes_3":
-      lifes = 5
+      lifes = 5;
       break;
     case "lifes_8":
       lifes = 10;
@@ -101,7 +107,7 @@ function saveSettings(){
     mode: selectedGameMode,
     time: time,
     lives: lifes,
-  }
+  };
   let message = {};
   message["type"] = "settings";
   message["content"] = settings;
