@@ -124,6 +124,7 @@ wsServer.on("request", (request) => {
             content["score"] = scoreboard;
             message["content"] = content;
             ws.send(JSON.stringify(message));
+            // TODO: Aqui hacemos SET del tiempo.
             break;
           case STATES.SCOREBOARD_FFA:
             let message_ffa = {};
@@ -143,6 +144,7 @@ wsServer.on("request", (request) => {
             devices.forEach((element) => {
               scoreboard.push({ name: element, kills: 0, deaths: 0 });
             });
+            console.log(scoreboard);
             break;
           default:
             break;
@@ -236,6 +238,7 @@ const connectUrl = protocol + "://" + host + ":" + port;
 const connectTopic = "Connections/Connect";
 const reconnectTopic = "Connections/Reconnect";
 const hitTopic = "Game/Hit";
+const killTopic = "Game/Kill";
 
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
@@ -265,9 +268,17 @@ mqttClient.on("message", (topic, payload) => {
     case hitTopic:
       if (current_state == STATES.SCOREBOARD) {
         registerHitTeams(JSON.parse(payload.toString()));
+        mqttClient.publish(
+          killTopic,
+          JSON.parse(payload.toString())["pistola"],
+        );
         // TODO: Aqui habra que poner que se apliquen las reglas.
       } else if (current_state == STATES.SCOREBOARD_FFA) {
         registerHitFFA(JSON.parse(payload.toString()));
+        mqttClient.publish(
+          killTopic,
+          JSON.parse(payload.toString())["pistola"],
+        );
       }
       break;
     default:
