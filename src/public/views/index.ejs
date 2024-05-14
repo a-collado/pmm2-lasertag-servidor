@@ -78,7 +78,7 @@
                 </div>
                 <br/>
             <% if (lifes === false) { %>
-                <h3>Tiempo restante:</h3> 
+                <h3 id="tiempo-restante">Tiempo restante:</h3> 
             <% } %>
             <button type="button" class="btn btn-primary" onclick="">Stop Game</button>
             <% } if (current_state === "scoreboard_ffa") { %>
@@ -98,7 +98,7 @@
                 </div>
                 <br/>
             <% if (lifes === false) { %>
-                <h3>Tiempo restante:</h3> 
+                <h3 id="tiempo-restante">Tiempo restante:</h3> 
             <% } %>
             <button type="button" class="btn btn-primary" onclick="">Stop Game</button>
             <% } if (current_state === "settings") { %>
@@ -141,14 +141,58 @@
                 
             </fieldset>
             <button type="button" class="btn btn-primary mt-2" onclick="saveSettings()">Continue with this settings</button>
-
                 <% if (teams === true) { %>
                 <button type="button" class="btn btn-secondary my-1" onclick="selectTeams()">Go Back</button>
                 <% } else { %>
                 <button type="button" class="btn btn-secondary my-1" onclick="selectFFA()">Go Back</button>
                 <% } %>
             <% } if (current_state === "waiting") { %>
+            <% } if (current_state === "end") { %>
+                <h1 class="my-4">Fin de la partida</h1>
+                <% if (teams === false) { %>
+                <div>
+                <h3>Resultados:</h3>
+                    <table id="scoreboad_ffa" class="table">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Kills</th>
+                            <th scope="col">Deaths</th>
+                            <% if (lifes === true) { %>
+                                <th scope="col">Lives</th>
+                            <% } %>
+                        </tr>
+                    </table>
+                </div>
+            <% } else { %>
+                <div>
+                <h3>Team 1</h3>
+                    <table id="scoreboad_team_1" class="table">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Kills</th>
+                            <th scope="col">Deaths</th>
+                            <% if (lifes === true) { %>
+                                <th scope="col">Lives</th>
+                            <% } %>
+                        </tr>
+                    </table>
 
+                    <br/><hr/>
+                    <h3>Team 2</h3>
+                    <table id="scoreboad_team_2" class="table">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Kills</th>
+                            <th scope="col">Deaths</th>
+                            <% if (lifes === true) { %>
+                                <th scope="col">Lives</th>
+                            <% } %>
+                        </tr>
+                    </table>
+                </div>
+            <% } %>
+                <br/>
+            <button type="button" class="btn btn-primary mt-2" onclick="goToDevices()">Return to start</button>
             <% } %>
         </main>
         <script>

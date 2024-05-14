@@ -21,6 +21,7 @@ const STATES = {
   SCOREBOARD_FFA: "scoreboard_ffa",
   SETTINGS: "settings",
   WAIT: "wait",
+  END: "end",
 };
 // Tiempo en ms que entre comprobaciones de conexion
 const RECONNECTION_TIME = 10000;
@@ -39,6 +40,7 @@ var rules = rules_default;
 var teams = false;
 var lifes = false;
 var ws_ip = "ws://" + process.env.IP + ":" + process.env.PORT;
+var current_time = 0;
 
 if (current_state === STATES.CONNECTING) {
   setRequestLoop();
@@ -88,6 +90,7 @@ wsServer.on("request", (request) => {
             current_state = STATES.CONNECTING;
             break;
           case "scoreboard":
+            setTimeLimit();
             if (teams) {
               current_state = STATES.SCOREBOARD;
             } else {
@@ -121,10 +124,13 @@ wsServer.on("request", (request) => {
             message["sender"] = "server";
             let content = {};
             content["destination"] = "scoreboard";
+            content["mode"] = rules.mode;
             content["score"] = scoreboard;
+            content["lives"] = rules.lives;
+            content["time"] = rules.time;
+            content["current_time"] = current_time;
             message["content"] = content;
             ws.send(JSON.stringify(message));
-            // TODO: Aqui hacemos SET del tiempo.
             break;
           case STATES.SCOREBOARD_FFA:
             let message_ffa = {};
@@ -134,6 +140,10 @@ wsServer.on("request", (request) => {
             if (!teams) {
               content_ffa["destination"] = "scoreboard_ffa";
             }
+            content_ffa["mode"] = rules.mode;
+            content_ffa["lives"] = rules.lives;
+            content_ffa["time"] = rules.time;
+            content_ffa["current_time"] = current_time;
             content_ffa["score"] = scoreboard;
             message_ffa["content"] = content_ffa;
             ws.send(JSON.stringify(message_ffa));
@@ -146,6 +156,22 @@ wsServer.on("request", (request) => {
             });
             console.log(scoreboard);
             break;
+          case STATES.END:
+            let message_end = {};
+            message_end["sender"] = "server";
+            message_end["type"] = "end";
+            if (teams) {
+              let content_ffa = {};
+              content_ffa["score"] = scoreboard;
+              content_ffa["mode"] = "team";
+              message_end["content"] = content_ffa;
+            } else {
+              let content_ffa = {};
+              content_ffa["score"] = scoreboard;
+              content_ffa["mode"] = "ffa";
+              message_end["content"] = content_ffa;
+            }
+            ws.send(JSON.stringify(message_end));
           default:
             break;
         }
@@ -180,6 +206,48 @@ wsServer.on("request", (request) => {
     console.log("El cliente se desconecto");
   });
 });
+
+var endTime;
+
+function setTimeLimit() {
+  //let interval = /*rules.time*/ 0.1 * 60 * 1000;
+  let interval = rules.time * 60 * 1000;
+  if (rules.mode === "time") {
+    endTime = setInterval(endGameTimeLimit, interval);
+    setCurrentTime(rules.time);
+  }
+}
+
+// TODO: No esta contando bien el tiempo o se desincroniza con la vista al hacer F5.
+function setCurrentTime(minutes) {
+  const totalSeconds = minutes * 60;
+
+  current_time = totalSeconds;
+
+  const intervalId = setInterval(() => {
+    current_time--;
+
+    if (current_time < 0) {
+      clearInterval(intervalId);
+    }
+  }, 1000);
+}
+
+function endGameTimeLimit() {
+  let message = {};
+  if (teams) {
+    message["type"] = "end_team";
+  } else {
+    message["type"] = "end_ffa";
+  }
+  message["sender"] = "server";
+  message["content"] = scoreboard;
+  ws.send(JSON.stringify(message));
+  clearInterval(endTime);
+  current_state = STATES.END;
+  reloadClient();
+  // TODO: Enviar mensaje a pistola indicando el fin del juego.
+}
 
 function reloadClient() {
   let message_r = {};
@@ -272,7 +340,7 @@ mqttClient.on("message", (topic, payload) => {
           killTopic,
           JSON.parse(payload.toString())["pistola"],
         );
-        // TODO: Aqui habra que poner que se apliquen las reglas.
+        // TODO: Aqui habra que poner que se quiten las vidas
       } else if (current_state == STATES.SCOREBOARD_FFA) {
         registerHitFFA(JSON.parse(payload.toString()));
         mqttClient.publish(

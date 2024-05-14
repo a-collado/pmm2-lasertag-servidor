@@ -47,30 +47,65 @@ function onMessage(evt) {
           break;
         case "scoreboard":
           createScore(m["score"]);
+          setCountDown(m["current_time"]);
           break;
         case "scoreboard_ffa":
           createScoreFFA(m["score"]);
+          setCountDown(m["current_time"]);
           break;
         case "freeforall":
           setFFA(m["devices"]);
           break;
         case "settings":
           break;
+
         default:
           break;
       }
       break;
     case "scoreboard":
       let score = data["content"];
-      updateScore(score);
+      if (score["mode"] === "time") {
+        updateScore(score);
+      }
       break;
     case "scoreboard_ffa":
       let score_ffa = data["content"];
-      updateScoreFFA(score_ffa);
+      if (score["mode"] === "time") {
+        updateScoreFFA(score);
+      }
+      break;
+    case "end":
+      let score_end = data["content"];
+      if (score_end["mode"] === "team") {
+        createScore(score_end["score"]);
+      } else {
+        createScoreFFA(score_end["score"]);
+      }
       break;
     default:
       break;
   }
+}
+
+function setCountDown(current_time) {
+  let remainingSeconds = current_time;
+
+  const intervalId = setInterval(() => {
+    const minutesRemaining = Math.floor(remainingSeconds / 60);
+    const secondsRemaining = remainingSeconds % 60;
+
+    const timeString = `${minutesRemaining.toString().padStart(2, "0")}:${secondsRemaining.toString().padStart(2, "0")}`;
+
+    let timer = document.getElementById("tiempo-restante");
+    timer.innerText = "Tiempo restante: " + timeString;
+
+    remainingSeconds--;
+
+    if (remainingSeconds < 0) {
+      clearInterval(intervalId);
+    }
+  }, 1000);
 }
 
 function saveSettings() {
