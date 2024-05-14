@@ -15,8 +15,10 @@ const wsServer = new WebSocketServer({
 
 const STATES = {
   CONNECTING: "connecting",
+  FFA: "freeforall",
   TEAMS: "teams",
   SCOREBOARD: "scoreboard",
+  SCOREBOARD_FFA: "scoreboard_ffa",
   SETTINGS: "settings",
   WAIT: "wait",
 };
@@ -34,6 +36,8 @@ var rules_default = {
   lives: 10,
 };
 var rules = rules_default;
+var teams = false;
+var lifes = false;
 var ws_ip = "ws://" + process.env.IP + ":" + process.env.PORT;
 
 if (current_state === STATES.CONNECTING) {
@@ -52,6 +56,8 @@ app.get("/", (req, res) => {
   const data = {
     current_state: current_state,
     ws_ip: ws_ip,
+    teams: teams,
+    lifes: lifes,
   };
   res.render("index", data);
 });
@@ -75,16 +81,27 @@ wsServer.on("request", (request) => {
           case "teamSelect":
             clearInterval(requestLoop);
             current_state = STATES.TEAMS;
+            teams = true;
             break;
           case "devicesScreen":
             setRequestLoop();
             current_state = STATES.CONNECTING;
             break;
           case "scoreboard":
-            current_state = STATES.SCOREBOARD;
+            if (teams) {
+              current_state = STATES.SCOREBOARD;
+            } else {
+              current_state = STATES.SCOREBOARD_FFA;
+            }
             break;
           case "settings":
             current_state = STATES.SETTINGS;
+            break;
+          case "ffa":
+            clearInterval(requestLoop);
+            current_state = STATES.FFA;
+            teams = false;
+            break;
           default:
             break;
         }
@@ -108,6 +125,25 @@ wsServer.on("request", (request) => {
             message["content"] = content;
             ws.send(JSON.stringify(message));
             break;
+          case STATES.SCOREBOARD_FFA:
+            let message_ffa = {};
+            message_ffa["type"] = "redirect";
+            message_ffa["sender"] = "server";
+            let content_ffa = {};
+            if (!teams) {
+              content_ffa["destination"] = "scoreboard_ffa";
+            }
+            content_ffa["score"] = scoreboard;
+            message_ffa["content"] = content_ffa;
+            ws.send(JSON.stringify(message_ffa));
+            break;
+          case STATES.FFA:
+            redirectClient("freeforall");
+            scoreboard = [];
+            devices.forEach((element) => {
+              scoreboard.push({ name: element, kills: 0, deaths: 0 });
+            });
+            break;
           default:
             break;
         }
@@ -130,6 +166,11 @@ wsServer.on("request", (request) => {
       }
       if (m["type"] === "settings") {
         rules = m["content"];
+        if (rules["mode"] === "lifes") {
+          lifes = true;
+        } else {
+          lifes = false;
+        }
       }
     }
   });
@@ -169,6 +210,14 @@ function setConnectedDevices() {
 function updateScoreboard() {
   let message = {};
   message["type"] = "scoreboard";
+  message["sender"] = "server";
+  message["content"] = scoreboard;
+  ws.send(JSON.stringify(message));
+}
+
+function updateScoreboardFFA() {
+  let message = {};
+  message["type"] = "scoreboard_ffa";
   message["sender"] = "server";
   message["content"] = scoreboard;
   ws.send(JSON.stringify(message));
@@ -217,6 +266,8 @@ mqttClient.on("message", (topic, payload) => {
       if (current_state == STATES.SCOREBOARD) {
         registerHitTeams(JSON.parse(payload.toString()));
         // TODO: Aqui habra que poner que se apliquen las reglas.
+      } else if (current_state == STATES.SCOREBOARD_FFA) {
+        registerHitFFA(JSON.parse(payload.toString()));
       }
       break;
     default:
@@ -225,6 +276,7 @@ mqttClient.on("message", (topic, payload) => {
 });
 
 function setRequestLoop() {
+  console.log("Starting device search");
   requestLoop = setInterval(checkConnectionDevices, RECONNECTION_TIME);
 }
 
@@ -258,6 +310,23 @@ function registerHitTeams(hitInformation) {
     scoreboard[fromT][fromP].deaths += 1;
     scoreboard[toT][toP].kills += 1;
     updateScoreboard();
+  }
+}
+
+function registerHitFFA(hitInformation) {
+  if (scoreboard.length === 0) {
+    return;
+  }
+  let from = hitInformation["chaleco"];
+  let to = hitInformation["pistola"];
+
+  let fromP = scoreboard.findIndex((player) => player.name === from);
+  let toP = scoreboard.findIndex((player) => player.name === to);
+
+  if (fromP != null && toP != null) {
+    scoreboard[fromP].deaths += 1;
+    scoreboard[toP].kills += 1;
+    updateScoreboardFFA();
   }
 }
 

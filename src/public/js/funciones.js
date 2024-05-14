@@ -48,6 +48,12 @@ function onMessage(evt) {
         case "scoreboard":
           createScore(m["score"]);
           break;
+        case "scoreboard_ffa":
+          createScoreFFA(m["score"]);
+          break;
+        case "freeforall":
+          setFFA(m["devices"]);
+          break;
         case "settings":
           break;
         default:
@@ -57,6 +63,10 @@ function onMessage(evt) {
     case "scoreboard":
       let score = data["content"];
       updateScore(score);
+      break;
+    case "scoreboard_ffa":
+      let score_ffa = data["content"];
+      updateScoreFFA(score_ffa);
       break;
     default:
       break;
@@ -118,6 +128,10 @@ function saveSettings() {
 
 function updateDevices(devices) {
   let list = document.getElementById("devices_connecting");
+
+  let goToTeamsScoreboardButton = document.getElementById("go-to-select-teams");
+  let goConfigureTeamsScoreboardButton =
+    document.getElementById("go-to-free-for-all");
   list.innerHTML = "";
   devices.forEach((element) => {
     let li = document.createElement("li");
@@ -125,6 +139,14 @@ function updateDevices(devices) {
     list.appendChild(li);
     li.classList.add("list-group-item");
   });
+
+  if (devices.length > 1) {
+    goToTeamsScoreboardButton.disabled = false;
+    goConfigureTeamsScoreboardButton.disabled = false;
+  } else {
+    goToTeamsScoreboardButton.disabled = true;
+    goConfigureTeamsScoreboardButton.disabled = true;
+  }
 }
 
 function setTeamSelect(devices) {
@@ -147,6 +169,82 @@ function setTeamSelect(devices) {
 
     list.appendChild(li);
   });
+
+  let teamList1 = document.querySelectorAll(
+    "#devices_teams input[id^='team1-']",
+  );
+
+  let teamList2 = document.querySelectorAll(
+    "#devices_teams input[id^='team2-']",
+  );
+
+  teamList1.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      checkTeams();
+    });
+  });
+
+  teamList2.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      checkTeams();
+    });
+  });
+}
+
+function checkTeams() {
+  let teamList1 = document.querySelectorAll(
+    "#devices_teams input[id^='team1-']",
+  );
+
+  let teamList2 = document.querySelectorAll(
+    "#devices_teams input[id^='team2-']",
+  );
+
+  const goToTeamsScoreboardButton = document.getElementById(
+    "go-to-teams-scoreboard",
+  );
+  const goConfigureTeamsScoreboardButton = document.getElementById(
+    "go-to-teams-settings",
+  );
+
+  let t1 = false;
+  let t2 = false;
+
+  teamList1.forEach((li) => {
+    if (li.checked) {
+      t1 = true;
+    }
+  });
+
+  teamList2.forEach((li) => {
+    if (li.checked) {
+      t2 = true;
+    }
+  });
+
+  if (t1 && t2) {
+    goToTeamsScoreboardButton.disabled = false;
+    goConfigureTeamsScoreboardButton.disabled = false;
+  } else {
+    goToTeamsScoreboardButton.disabled = true;
+    goConfigureTeamsScoreboardButton.disabled = true;
+  }
+}
+
+function setFFA(devices) {
+  let list = document.getElementById("devices_ffa");
+
+  list.innerHTML = "";
+
+  devices.forEach((element) => {
+    let li = document.createElement("li");
+
+    li.innerHTML = `
+    <span>${element}</span>
+    `;
+
+    list.appendChild(li);
+  });
 }
 
 function createScore(score) {
@@ -160,6 +258,11 @@ function createScore(score) {
   populateScore(team_2_scoreboard, team_2);
 }
 
+function createScoreFFA(score) {
+  let scoreboard = document.getElementById("scoreboad_ffa");
+  populateScore(scoreboard, score);
+}
+
 function updateScore(score) {
   let team_1 = score[0];
   let team_2 = score[1];
@@ -169,6 +272,11 @@ function updateScore(score) {
 
   let team_2_scoreboard = document.getElementById("scoreboad_team_2");
   replaceScore(team_2_scoreboard, team_2);
+}
+
+function updateScoreFFA(score) {
+  let scoreboard = document.getElementById("scoreboad_ffa");
+  replaceScore(scoreboard, score);
 }
 
 function replaceScore(scoreboard, score) {
@@ -214,6 +322,14 @@ function selectTeams() {
   doSend(JSON.stringify(message));
 }
 
+function selectFFA() {
+  let message = {};
+  message["type"] = "redirect";
+  message["content"] = "ffa";
+  message["sender"] = "client";
+  doSend(JSON.stringify(message));
+}
+
 function goToDevices() {
   let message = {};
   message["type"] = "redirect";
@@ -239,6 +355,14 @@ function goToScoreboard() {
 
 function goToSettings() {
   setTeams();
+  let message = {};
+  message["type"] = "redirect";
+  message["content"] = "settings";
+  message["sender"] = "client";
+  doSend(JSON.stringify(message));
+}
+
+function goToSettingsFFA() {
   let message = {};
   message["type"] = "redirect";
   message["content"] = "settings";

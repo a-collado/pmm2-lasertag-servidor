@@ -12,18 +12,41 @@
                 <h1>Elegir equipos:</h1>
                 <ul id="devices_teams"></ul>
                 <div class="row p-2">
-                    <button type="button" class="btn btn-primary col me-2 " onclick="setTeamsToScoreboard()">Quick Play</button>
-                    <button type="button" class="btn btn-warning col " onclick="goToSettings()">Configure Game</button>
+                    <button type="button" id="go-to-teams-scoreboard" class="btn btn-primary col me-2 " onclick="setTeamsToScoreboard()">Quick Play</button>
+                    <button type="button" id="go-to-teams-settings" class="btn btn-warning col " onclick="goToSettings()">Configure Game</button>
                 </div>
                 <button type="button" class="btn btn-secondary " onclick="goToDevices()">Go Back</button>
+               <script>
+                const goToTeamsScoreboardButton = document.getElementById('go-to-teams-scoreboard');
+                const goConfigureTeamsScoreboardButton = document.getElementById('go-to-teams-settings');
+
+                goToTeamsScoreboardButton.disabled = true;
+                goConfigureTeamsScoreboardButton.disabled = true;
+               </script> 
+        <% } if (current_state === "freeforall") { %>
+                <h1>Jugadores:</h1>
+                <ul id="devices_ffa"></ul>
+                <div class="row p-2">
+                    <button type="button" class="btn btn-primary col me-2 " onclick="setTeamsToScoreboard()">Quick Play</button>
+                    <button type="button" class="btn btn-warning col " onclick="goToSettingsFFA()">Configure Game</button>
+                </div>
+                <button type="button" class="btn btn-secondary " onclick="goToDevices()">Go Back</button>
+
             <% } if (current_state === "connecting") { %>
                 <h1>Dispositivos conectados:</h1>
                 <ul id="devices_connecting" class="list-group"></ul>
 
                 <div class="row">
-                    <button type="button" class="btn btn-primary col me-2" onclick="selectTeams()">Select Teams</button>
-                    <button type="button" class="btn btn-warning col" onclick="">Free for all</button>
+                    <button type="button" id="go-to-select-teams" class="btn btn-primary col me-2" onclick="selectTeams()">Select Teams</button>
+                    <button type="button" id="go-to-free-for-all" class="btn btn-warning col" onclick="selectFFA()">Free for all</button>
                 </div>
+                <script>
+                    const goToTeamsScoreboardButton = document.getElementById('go-to-select-teams');
+                    const goConfigureTeamsScoreboardButton = document.getElementById('go-to-free-for-all');
+
+                    goToTeamsScoreboardButton.disabled = true;
+                    goConfigureTeamsScoreboardButton.disabled = true;
+                </script>
                 
             <% } if (current_state === "scoreboard") { %>
                 <h1>Puntuaciones:</h1> 
@@ -34,6 +57,9 @@
                             <th scope="col">Name</th>
                             <th scope="col">Kills</th>
                             <th scope="col">Deaths</th>
+                            <% if (lifes === true) { %>
+                                <th scope="col">Lives</th>
+                            <% } %>
                         </tr>
                     </table>
 
@@ -44,10 +70,36 @@
                             <th scope="col">Name</th>
                             <th scope="col">Kills</th>
                             <th scope="col">Deaths</th>
+                            <% if (lifes === true) { %>
+                                <th scope="col">Lives</th>
+                            <% } %>
                         </tr>
                     </table>
                 </div>
                 <br/>
+            <% if (lifes === false) { %>
+                <h3>Tiempo restante:</h3> 
+            <% } %>
+            <button type="button" class="btn btn-primary" onclick="">Stop Game</button>
+            <% } if (current_state === "scoreboard_ffa") { %>
+                <h1>Puntuaciones:</h1> 
+                <div>
+                <h3>Jugadores</h3>
+                    <table id="scoreboad_ffa" class="table">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Kills</th>
+                            <th scope="col">Deaths</th>
+                            <% if (lifes === true) { %>
+                                <th scope="col">Lives</th>
+                            <% } %>
+                        </tr>
+                    </table>
+                </div>
+                <br/>
+            <% if (lifes === false) { %>
+                <h3>Tiempo restante:</h3> 
+            <% } %>
             <button type="button" class="btn btn-primary" onclick="">Stop Game</button>
             <% } if (current_state === "settings") { %>
             <h1 class="my-4">Ajustes de la partida:</h1>
@@ -89,7 +141,14 @@
                 
             </fieldset>
             <button type="button" class="btn btn-primary mt-2" onclick="saveSettings()">Continue with this settings</button>
-            <button type="button" class="btn btn-secondary my-1" onclick="selectTeams()">Go Back</button>
+
+                <% if (teams === true) { %>
+                <button type="button" class="btn btn-secondary my-1" onclick="selectTeams()">Go Back</button>
+                <% } else { %>
+                <button type="button" class="btn btn-secondary my-1" onclick="selectFFA()">Go Back</button>
+                <% } %>
+            <% } if (current_state === "waiting") { %>
+
             <% } %>
         </main>
         <script>
