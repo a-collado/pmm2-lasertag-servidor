@@ -353,14 +353,7 @@ mqttClient.on("message", (topic, payload) => {
       } else if (current_state == STATES.SCOREBOARD_FFA) {
         registerHitFFA(JSON.parse(payload.toString()));
       }
-      if (
-        current_state === STATES.SCOREBOARD ||
-        current_state === STATES.SCOREBOARD_FFA
-      ) {
-        let pistola = JSON.parse(payload.toString())["pistola"];
-        let topic_k = killTopic.concat(pistola);
-        mqttClient.publish(topic_k, "kill");
-      }
+
       break;
     default:
       break;
@@ -426,6 +419,8 @@ function registerHitTeams(hitInformation) {
   if (fromT !== toT) {
     scoreboard[fromT][fromP].deaths += 1;
     scoreboard[toT][toP].kills += 1;
+
+    sendKill(to);
     updateScoreboard();
   }
 }
@@ -453,8 +448,15 @@ function registerHitFFA(hitInformation) {
   if (fromP != null && toP != null && fromP !== toP) {
     scoreboard[fromP].deaths += 1;
     scoreboard[toP].kills += 1;
+
+    sendKill(to);
     updateScoreboardFFA();
   }
+}
+
+function sendKill(pistola) {
+  let topic_k = killTopic.concat(pistola);
+  mqttClient.publish(topic_k, "kill");
 }
 
 function setPeriods() {
