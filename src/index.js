@@ -219,8 +219,8 @@ var endTime;
 
 function setTimeLimit() {
   // WARN: AQUI!!!!!
-  let interval = /*rules.time*/ 0.1 * 60 * 1000;
-  //let interval = rules.time * 60 * 1000;
+  // let interval = /*rules.time*/ 0.1 * 60 * 1000;
+  let interval = rules.time * 60 * 1000;
   //if (rules.mode === "time") {
   endTime = setInterval(endGameTimeLimit, interval);
   setCurrentTime(rules.time);
