@@ -65,15 +65,11 @@ function onMessage(evt) {
       break;
     case "scoreboard":
       let score = data["content"];
-      if (score["mode"] === "time") {
-        updateScore(score);
-      }
+      updateScore(score);
       break;
     case "scoreboard_ffa":
       let score_ffa = data["content"];
-      if (score["mode"] === "time") {
-        updateScoreFFA(score);
-      }
+      updateScoreFFA(score_ffa);
       break;
     case "end":
       let score_end = data["content"];
@@ -88,6 +84,7 @@ function onMessage(evt) {
   }
 }
 
+// TODO: No esta contando bien el tiempo:
 function setCountDown(current_time) {
   let remainingSeconds = current_time;
 

@@ -23,6 +23,9 @@ const STATES = {
   WAIT: "wait",
   END: "end",
 };
+
+const PERIODS = [80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280];
+
 // Tiempo en ms que entre comprobaciones de conexion
 const RECONNECTION_TIME = 10000;
 
@@ -90,7 +93,10 @@ wsServer.on("request", (request) => {
             current_state = STATES.CONNECTING;
             break;
           case "scoreboard":
+            setPeriods();
+            // TODO: Enviarle al ESP de que equipo es
             setTimeLimit();
+            sendStartGame();
             if (teams) {
               current_state = STATES.SCOREBOARD;
             } else {
@@ -152,6 +158,7 @@ wsServer.on("request", (request) => {
             redirectClient("freeforall");
             scoreboard = [];
             devices.forEach((element) => {
+              sendTeam(element, "3");
               scoreboard.push({ name: element, kills: 0, deaths: 0 });
             });
             console.log(scoreboard);
@@ -184,8 +191,10 @@ wsServer.on("request", (request) => {
         m["content"].forEach((element) => {
           let p = { name: element["name"], kills: 0, deaths: 0 };
           if (element["team"] === 1) {
+            sendTeam(p["name"], "1");
             team_1.push(p);
           } else {
+            sendTeam(p["name"], "2");
             team_2.push(p);
           }
         });
@@ -246,7 +255,7 @@ function endGameTimeLimit() {
   clearInterval(endTime);
   current_state = STATES.END;
   reloadClient();
-  // TODO: Enviar mensaje a pistola indicando el fin del juego.
+  sendEndGame();
 }
 
 function reloadClient() {
@@ -305,8 +314,12 @@ const connectUrl = protocol + "://" + host + ":" + port;
 
 const connectTopic = "Connections/Connect";
 const reconnectTopic = "Connections/Reconnect";
+const periodTopic = "Connections/Period/";
 const hitTopic = "Game/Hit";
-const killTopic = "Game/Kill";
+const killTopic = "Game/Kill/";
+const startTopic = "Game/Start";
+const endTopic = "Game/End";
+const teamTopic = "Connections/Team/";
 
 const mqttClient = mqtt.connect(connectUrl, {
   clientId,
@@ -336,17 +349,17 @@ mqttClient.on("message", (topic, payload) => {
     case hitTopic:
       if (current_state == STATES.SCOREBOARD) {
         registerHitTeams(JSON.parse(payload.toString()));
-        mqttClient.publish(
-          killTopic,
-          JSON.parse(payload.toString())["pistola"],
-        );
         // TODO: Aqui habra que poner que se quiten las vidas
       } else if (current_state == STATES.SCOREBOARD_FFA) {
         registerHitFFA(JSON.parse(payload.toString()));
-        mqttClient.publish(
-          killTopic,
-          JSON.parse(payload.toString())["pistola"],
-        );
+      }
+      if (
+        current_state === STATES.SCOREBOARD ||
+        current_state === STATES.SCOREBOARD_FFA
+      ) {
+        let pistola = JSON.parse(payload.toString())["pistola"];
+        let topic_k = killTopic.concat(pistola);
+        mqttClient.publish(topic_k, "kill");
       }
       break;
     default:
@@ -364,6 +377,21 @@ function checkConnectionDevices() {
   setTimeout(setConnectedDevices, RECONNECTION_TIME / 2);
 }
 
+function findClosestPeriodIndex(number) {
+  let closestIndex = 0;
+  let smallestDifference = Math.abs(number - PERIODS[0]);
+
+  for (let i = 1; i < PERIODS.length; i++) {
+    let currentDifference = Math.abs(number - PERIODS[i]);
+    if (currentDifference < smallestDifference) {
+      smallestDifference = currentDifference;
+      closestIndex = i;
+    }
+  }
+
+  return closestIndex;
+}
+
 function registerHitTeams(hitInformation) {
   if (scoreboard.length === 0) {
     return;
@@ -377,6 +405,16 @@ function registerHitTeams(hitInformation) {
     fromP = scoreboard[1].findIndex((player) => player.name === from);
     fromT = 1;
   }
+
+  if (to == 0) {
+    return;
+  }
+
+  let index = findClosestPeriodIndex(to);
+  if (index < devices) {
+    return;
+  }
+  to = devices[index];
 
   let toP = scoreboard[0].findIndex((player) => player.name === to);
   let toT = 0;
@@ -399,16 +437,45 @@ function registerHitFFA(hitInformation) {
   let from = hitInformation["chaleco"];
   let to = hitInformation["pistola"];
 
+  if (to == 0) {
+    return;
+  }
+
+  let index = findClosestPeriodIndex(to);
+  if (index < devices) {
+    return;
+  }
+  to = devices[index];
+
   let fromP = scoreboard.findIndex((player) => player.name === from);
   let toP = scoreboard.findIndex((player) => player.name === to);
 
-  if (fromP != null && toP != null) {
+  if (fromP != null && toP != null && fromP !== toP) {
     scoreboard[fromP].deaths += 1;
     scoreboard[toP].kills += 1;
     updateScoreboardFFA();
   }
 }
 
+function setPeriods() {
+  for (let index = 0; index < devices.length; index++) {
+    let topic = periodTopic.concat(devices[index]);
+    mqttClient.publish(topic, PERIODS[index].toString());
+  }
+}
+
+function sendStartGame() {
+  mqttClient.publish(startTopic, "start");
+}
+
+function sendEndGame() {
+  mqttClient.publish(endTopic, "end");
+}
+
+function sendTeam(player, team) {
+  let t = teamTopic.concat(player);
+  mqttClient.publish(t, team);
+}
 // Iniciamos el servidor en el puerto establecido por la variable port (3000)
 server.listen(app.get("port"), () => {
   console.log("Servidor iniciado en el puerto: " + app.get("port"));

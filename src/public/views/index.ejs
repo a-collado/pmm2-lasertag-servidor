@@ -36,7 +36,7 @@
                 <h1>Dispositivos conectados:</h1>
                 <ul id="devices_connecting" class="list-group"></ul>
 
-                <div class="row">
+                <div class="row mt-3">
                     <button type="button" id="go-to-select-teams" class="btn btn-primary col me-2" onclick="selectTeams()">Select Teams</button>
                     <button type="button" id="go-to-free-for-all" class="btn btn-warning col" onclick="selectFFA()">Free for all</button>
                 </div>
@@ -80,7 +80,6 @@
             <% if (lifes === false) { %>
                 <h3 id="tiempo-restante">Tiempo restante:</h3> 
             <% } %>
-            <button type="button" class="btn btn-primary" onclick="">Stop Game</button>
             <% } if (current_state === "scoreboard_ffa") { %>
                 <h1>Puntuaciones:</h1> 
                 <div>
@@ -100,7 +99,6 @@
             <% if (lifes === false) { %>
                 <h3 id="tiempo-restante">Tiempo restante:</h3> 
             <% } %>
-            <button type="button" class="btn btn-primary" onclick="">Stop Game</button>
             <% } if (current_state === "settings") { %>
             <h1 class="my-4">Ajustes de la partida:</h1>
             <fieldset class="card my-2">
@@ -146,7 +144,7 @@
                 <% } else { %>
                 <button type="button" class="btn btn-secondary my-1" onclick="selectFFA()">Go Back</button>
                 <% } %>
-            <% } if (current_state === "waiting") { %>
+            <% } if (current_state === "wait") { %>
             <% } if (current_state === "end") { %>
                 <h1 class="my-4">Fin de la partida</h1>
                 <% if (teams === false) { %>
