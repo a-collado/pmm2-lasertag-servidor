@@ -94,7 +94,6 @@ wsServer.on("request", (request) => {
             break;
           case "scoreboard":
             setPeriods();
-            // TODO: Enviarle al ESP de que equipo es
             setTimeLimit();
             sendStartGame();
             if (teams) {
@@ -219,12 +218,13 @@ wsServer.on("request", (request) => {
 var endTime;
 
 function setTimeLimit() {
-  //let interval = /*rules.time*/ 0.1 * 60 * 1000;
-  let interval = rules.time * 60 * 1000;
-  if (rules.mode === "time") {
-    endTime = setInterval(endGameTimeLimit, interval);
-    setCurrentTime(rules.time);
-  }
+  // WARN: AQUI!!!!!
+  let interval = /*rules.time*/ 0.1 * 60 * 1000;
+  //let interval = rules.time * 60 * 1000;
+  //if (rules.mode === "time") {
+  endTime = setInterval(endGameTimeLimit, interval);
+  setCurrentTime(rules.time);
+  //}
 }
 
 // TODO: No esta contando bien el tiempo o se desincroniza con la vista al hacer F5.

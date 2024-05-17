@@ -426,7 +426,6 @@ function setTeams() {
   message["content"] = teams;
 
   doSend(JSON.stringify(message));
-  goToScoreboard();
 }
 
 function setTeamsToScoreboard() {
