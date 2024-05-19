@@ -10,7 +10,7 @@
   --button_background:#F8FAFC;
   --button_outline:#CBD5E1;
   --button_text:#64748B;
-
+  --gray: #E2E8F0;
 }
 
 *{
@@ -173,6 +173,20 @@ Equipos + Jugadores + Dispositivos
   color: var(--orange2);
   font-size: 16px;
 }
+.btn_play:disabled {
+  background-color: var(--gray);
+  border-radius: 50px;
+  height: 50px;
+  width: 180px;
+  border-color: transparent;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--button_text);
+  font-size: 16px;
+}
   
 .btn_create {
   background-color: var(--orange2);
@@ -186,6 +200,21 @@ Equipos + Jugadores + Dispositivos
   font-weight: 500;
   font-style: normal;
   color: var(--orange);
+  font-size: 16px;
+}
+
+.btn_create:disabled {
+  background-color: var(--gray);
+  border-radius: 50px;
+  height: 50px;
+  width: 180px;
+  border-color: transparent;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--button_text);
   font-size: 16px;
 }
   
@@ -338,7 +367,7 @@ font-size: 24px;
 .marcador{
 position: relative;
 width: 300px;
-height: 140px;
+height: fit-content;
 margin-top: 40px;
 }
 .tit_marcador{

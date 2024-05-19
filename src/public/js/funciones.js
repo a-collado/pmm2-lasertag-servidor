@@ -95,7 +95,7 @@ function setCountDown(current_time) {
     const timeString = `${minutesRemaining.toString().padStart(2, "0")}:${secondsRemaining.toString().padStart(2, "0")}`;
 
     let timer = document.getElementById("tiempo-restante");
-    timer.innerText = "Tiempo restante: " + timeString;
+    timer.innerText = timeString;
 
     remainingSeconds--;
 
