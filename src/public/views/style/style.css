@@ -195,17 +195,6 @@ Equipos + Jugadores + Dispositivos
   padding: 0; 
 }
 
-.player-container {
-  display: flex; 
-  align-items: center; 
-  margin-bottom: 10px;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
-}
 
 .list-group-item {
   padding: 0; 
@@ -221,14 +210,6 @@ Equipos + Jugadores + Dispositivos
   position: relative;
 }
 
-.avatar_teams {
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
-  position: absolute;
-  top: 0; 
-  left: 30px;
-}
 .team-selector {
   margin-left: 10px;
 }
