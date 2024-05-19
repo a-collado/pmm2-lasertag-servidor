@@ -307,6 +307,7 @@ padding-top: 25px;
 padding-bottom: 25px;
 background-color: var(--orange2);
 text-align: center;
+width: 100%;
 /*max-width: 900px;*/
 }
 
@@ -367,7 +368,7 @@ font-size: 24px;
 .marcador{
 position: relative;
 width: 300px;
-height: fit-content;
+height: 200px;
 margin-top: 40px;
 }
 .tit_marcador{
