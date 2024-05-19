@@ -24,7 +24,7 @@ const STATES = {
   END: "end",
 };
 
-const PERIODS = [80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280];
+const PERIODS = [60, 20, 30, 40, 50, 10, 70, 80, 90, 100, 110, 120, 130, 140];
 
 // Tiempo en ms que entre comprobaciones de conexion
 const RECONNECTION_TIME = 10000;
@@ -319,6 +319,7 @@ const hitTopic = "Game/Hit";
 const killTopic = "Game/Kill/";
 const startTopic = "Game/Start";
 const endTopic = "Game/End";
+const receiveTopic = "Game/ReceiveHit";
 const teamTopic = "Connections/Team/";
 
 const mqttClient = mqtt.connect(connectUrl, {
@@ -335,8 +336,8 @@ mqttClient.on("connect", () => {
     console.log("Subscribe to topic " + reconnectTopic);
   });
 
-  mqttClient.subscribe([hitTopic], () => {
-    console.log("Subscribe to topic " + hitTopic);
+  mqttClient.subscribe([receiveTopic], () => {
+    console.log("Subscribe to topic " + receiveTopic);
   });
 });
 
@@ -346,7 +347,7 @@ mqttClient.on("message", (topic, payload) => {
     case reconnectTopic:
       connectedDevices.push(payload.toString());
       break;
-    case hitTopic:
+    case receiveTopic:
       if (current_state == STATES.SCOREBOARD) {
         registerHitTeams(JSON.parse(payload.toString()));
         // TODO: Aqui habra que poner que se quiten las vidas
