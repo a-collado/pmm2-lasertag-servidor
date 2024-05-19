@@ -1,5 +1,21 @@
 const wsIPDiv = document.getElementById("ws-ip");
 const ws_ip = wsIPDiv.dataset.myString;
+const avatars = [
+  "bear.png",
+  "cat.png",
+  "chicken.png",
+  "dog.png",
+  "duck.png",
+  "giraffe.png",
+  "gorilla.png",
+  "hippo.png",
+  "meerkat.png",
+  "panda.png",
+  "puffer-fish.png",
+  "rabbit.png"
+];
+let avatarIndex = 0;
+
 
 function init() {
   wsConnect();
@@ -166,10 +182,27 @@ function updateDevices(devices) {
     document.getElementById("go-to-free-for-all");
   list.innerHTML = "";
   devices.forEach((element) => {
+    let div = document.createElement("div");
+    div.classList.add("player-container");
+    
+    let avatar = document.createElement("img");
+    avatar.src = `imagenes/avatar/${avatars[avatarIndex]}`;
+    avatar.alt = "Avatar";
+    avatar.classList.add("avatar");
+
     let li = document.createElement("li");
     li.innerText = element;
-    list.appendChild(li);
     li.classList.add("list-group-item");
+
+    div.appendChild(avatar);
+    div.appendChild(li);
+    container.appendChild(div);
+  
+      // Incrementa el índice del avatar y vuelve a 0 si llega al final del array
+      avatarIndex++;
+      if (avatarIndex >= avatars.length) {
+        avatarIndex = 0;
+      }
   });
 
   if (devices.length > 1) {
@@ -187,15 +220,33 @@ function setTeamSelect(devices) {
   list.innerHTML = "";
 
   devices.forEach((element) => {
+    let div = document.createElement("div");
+    div.classList.add("player-container_teams");
+    
+    let avatar = document.createElement("img");
+    avatar.src = `imagenes/avatar/${avatars[avatarIndex]}`;
+    avatar.alt = "Avatar";
+    avatar.classList.add("avatar_teams");
+
     let li = document.createElement("li");
+    li.classList.add("list-group-item");
+
+    div.appendChild(avatar);
+    container.appendChild(div);
+  
+      // Incrementa el índice del avatar y vuelve a 0 si llega al final del array
+      avatarIndex++;
+      if (avatarIndex >= avatars.length) {
+        avatarIndex = 0;
+      }
 
     li.innerHTML = `
     <span>${element}</span>
     <div class="team-selector">
-      <input type="radio" name="team-${element}" class="form-check-input" value="team1" id="team1-${element}" checked>
-      <label for="team1-${element}">Team 1</label>
-      <input type="radio" name="team-${element}" class="form-check-input" value="team2" id="team2-${element}">
-      <label for="team2-${element}">Team 2</label>
+      <input type="radio" name="team-${element}" class="btn_blue" value="team1" id="team1-${element}" checked>
+      <label for="team1-${element}">Equipo Azul</label>
+      <input type="radio" name="team-${element}" class="btn_orange" value="team2" id="team2-${element}">
+      <label for="team2-${element}">Equipo Naranja</label>
     </div>
     `;
 
@@ -269,13 +320,29 @@ function setFFA(devices) {
   list.innerHTML = "";
 
   devices.forEach((element) => {
-    let li = document.createElement("li");
+    let div = document.createElement("div");
+    div.classList.add("player-container");
+    
+    let avatar = document.createElement("img");
+    avatar.src = `imagenes/avatar/${avatars[avatarIndex]}`;
+    avatar.alt = "Avatar";
+    avatar.classList.add("avatar");
 
+    let li = document.createElement("li");
     li.innerHTML = `
     <span>${element}</span>
     `;
+    li.classList.add("list-group-item");
 
-    list.appendChild(li);
+    div.appendChild(avatar);
+    div.appendChild(li);
+    container.appendChild(div);
+  
+      // Incrementa el índice del avatar y vuelve a 0 si llega al final del array
+      avatarIndex++;
+      if (avatarIndex >= avatars.length) {
+        avatarIndex = 0;
+      }
   });
 }
 

@@ -123,60 +123,172 @@ text-align: center;
 
 }
 
-.hero_buttons{
-margin: 1rem; 
+/*-------------
+Equipos + Jugadores + Dispositivos
+-------------*/
+#jugadores, #equipos, #dispositivos{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  text-align: center;
+  background-color: var(--blue3);
+}
+.tit_jugadores{
+  color:var(--white);
+  font-size: 30px;
 }
 
+.btn_back2 {
+  background-color: var(--blue4);
+  border-radius: 50px;
+  height: 50px;
+  width: 180px;
+  border-color: transparent;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--blue3);
+  font-size: 16px;
+}
+
+.buttons{
+  margin: 1rem; 
+}
+  
 .btn_play {
-background-color: var(--orange);
-border-radius: 50px;
-height: 50px;
-width: 180px;
-border-color: transparent;
-align-items: center;
-margin-bottom: 0.5rem;
-font-family: "Roboto", sans-serif;
-font-weight: 500;
-font-style: normal;
-color: var(--orange2);
-font-size: 16px;
+  background-color: var(--orange);
+  border-radius: 50px;
+  height: 50px;
+  width: 180px;
+  border-color: transparent;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--orange2);
+  font-size: 16px;
 }
-
+  
 .btn_create {
-background-color: var(--orange2);
-border-radius: 50px;
-height: 50px;
-width: 180px;
-border-color: transparent;
-align-items: center;
-margin-bottom: 0.5rem;
-font-family: "Roboto", sans-serif;
-font-weight: 500;
-font-style: normal;
-color: var(--orange);
-font-size: 16px;
+  background-color: var(--orange2);
+  border-radius: 50px;
+  height: 50px;
+  width: 180px;
+  border-color: transparent;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--orange);
+  font-size: 16px;
+}
+  
+/* Dispositivos */
+#devices_connecting, #devices_teams, #devices_ffa {
+  list-style: none; 
+  padding: 0; 
 }
 
-.btn_back {
-background-color: var(--blue3);
-border-radius: 50px;
-height: 50px;
-width: 180px;
-border-color: transparent;
-align-items: center;
-margin-bottom: 0.5rem;
-font-family: "Roboto", sans-serif;
-font-weight: 500;
-font-style: normal;
-color: var(--white);
-font-size: 16px;
+.player-container {
+  display: flex; 
+  align-items: center; 
+  margin-bottom: 10px;
 }
 
+.avatar {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
 
+.list-group-item {
+  padding: 0; 
+  line-height: 40px;
+  color: var(--white);
+}
+
+/* Equipo */
+.player-container_teams {
+  display: flex; 
+  align-items: center; 
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.avatar_teams {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  position: absolute;
+  top: 0; 
+  left: 30px;
+}
+.team-selector {
+  margin-left: 10px;
+}
+
+.btn_blue + label {
+  display: inline-block;
+  background-color: var(--white);
+  color: var(--blue);
+  border: 1px solid var(--button_outline);
+  border-radius: 50px;
+  padding: 4px 8px;
+  margin-top: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+  
+  /* Estilos cuando el botón de radio está seleccionado */
+.btn_blue:checked + label {
+  background-color: var(--blue);
+  color: var(--white);
+  border: 0px;
+}
+
+.btn_orange + label {
+  display: inline-block;
+  background-color: var(--white);
+  color: var(--orange);
+  border: 1px solid var(--button_outline);
+  border-radius: 50px;
+  padding: 4px 8px;
+  margin-top: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+  
+  /* Estilos cuando el botón de radio está seleccionado */
+.btn_orange:checked + label {
+  background-color: var(--orange);
+  color: var(--white);
+  border: 0px;
+}
 
 /*-------------
 Settings
 -------------*/
+.btn_back {
+  background-color: var(--blue3);
+  border-radius: 50px;
+  height: 50px;
+  width: 180px;
+  border-color: transparent;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--white);
+  font-size: 16px;
+}
+
 #createPlay{
 display: flex;
 flex-direction: column;
@@ -214,7 +326,7 @@ cursor: pointer;
 }
 
 /* Estilos cuando el botón de radio está seleccionado */
-input[type="radio"]:checked + label {
+.form-check-input:checked + label {
 background-color: var(--orange);
 color: var(--white);
 border: 0px;

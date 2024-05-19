@@ -25,15 +25,30 @@
                 <h4>Juega una partida rápida o<br>personaliza tu partida.<br>¡Sé el héroe del Slayser Tag<br>y desata la diversión!</h4>
                 <div class="imglaser">
                   <img src="images/Blue_lasertag.png" alt="laser blue" title="laser blue">
-                </div> 
+                </div>
+            </section>
             <% if (current_state === "teams") { %>
-                <!--<h1>Elegir equipos:</h1>-->
-                <ul id="devices_teams"></ul>
-                <div class="hero_buttons">
+            <section id="equipos">
+                <h1 class="tit_jugadores">Elegir equipos</h1>
+                <ul id="devices_teams">
+                    <div class="player-container_teams">
+                        <img src="images/avatar/bear.png" alt="avatar" class="avatar_teams">
+                        <li class="list-group-item">
+                            Jugador 1
+                            <div class="team-selector">
+                                <input type="radio" name="team-${element}" class="btn_blue" value="team1" id="team1-${element}" checked>
+                                <label for="team1-${element}">Equipo Azul</label>
+                                <input type="radio" name="team-${element}" class="btn_orange" value="team2" id="team2-${element}">
+                                <label for="team2-${element}">Equipo Naranja</label>
+                            </div>
+                        </li>
+                    </div>
+                </ul>
+                <div class="buttons">
                     <button type="button" id="go-to-teams-scoreboard" class="btn_play" onclick="setTeamsToScoreboard()">QUICK PLAY</button>
                     <button type="button" id="go-to-teams-settings" class="btn_create" onclick="goToSettings()">CREATE GAME</button>
                 </div>
-                <button type="button" class="btn_back" onclick="goToDevices()">GO BACK</button>
+                <button type="button" class="btn_back2" onclick="goToDevices()">GO BACK</button>
                <script>
                 const goToTeamsScoreboardButton = document.getElementById('go-to-teams-scoreboard');
                 const goConfigureTeamsScoreboardButton = document.getElementById('go-to-teams-settings');
@@ -43,29 +58,48 @@
                </script> 
             </section>
         <% } if (current_state === "freeforall") { %>
-                <h1>Jugadores:</h1>
-                <ul id="devices_ffa"></ul>
-                <div class="row p-2">
-                    <button type="button" class="btn btn-primary col me-2 " onclick="goToScoreboard()">Quick Play</button>
-                    <button type="button" class="btn btn-warning col " onclick="goToSettingsFFA()">Configure Game</button>
+            <section id="jugadores">
+                <h1 class="tit_jugadores">Jugadores conectados</h1>
+                <ul id="devices_ffa">
+                    <div class="player-container">
+                        <img src="images/avatar/bear.png" alt="avatar" class="avatar">
+                        <li class="list-group-item">
+                            Jugador 1
+                        </li>
+                    </div>
+                </ul>
+                <div class="buttons">
+                    <button type="button" class="btn_play" onclick="goToScoreboard()">QUICK PLAY</button>
+                    <button type="button" class="btn_create" onclick="goToSettingsFFA()">CREATE GAME</button>
                 </div>
-                <button type="button" class="btn btn-secondary " onclick="goToDevices()">Go Back</button>
-
+                <button type="button" class="btn_back2" onclick="goToDevices()">GO BACK</button>
+            </section>
+                
             <% } if (current_state === "connecting") { %>
-                <h1>Dispositivos conectados:</h1>
-                <ul id="devices_connecting" class="list-group"></ul>
+                <section id="dispositivos">
+                    <h1 class="tit_jugadores">Dispositivos conectados</h1>
+                
+                    <ul id="devices_connecting" class="list-group">
+                        <div class="player-container">
+                            <img src="images/avatar/bear.png" alt="avatar" class="avatar">
+                            <li class="list-group-item">
+                                Jugador 1
+                            </li>
+                        </div>
+                    </ul>
 
-                <div class="row mt-3">
-                    <button type="button" id="go-to-select-teams" class="btn btn-primary col me-2" onclick="selectTeams()">Select Teams</button>
-                    <button type="button" id="go-to-free-for-all" class="btn btn-warning col" onclick="selectFFA()">Free for all</button>
-                </div>
-                <script>
-                    const goToTeamsScoreboardButton = document.getElementById('go-to-select-teams');
-                    const goConfigureTeamsScoreboardButton = document.getElementById('go-to-free-for-all');
+                    <div class="buttons">
+                        <button type="button" id="go-to-select-teams" class="btn_play" onclick="selectTeams()">SELECT TEAMS</button>
+                        <button type="button" id="go-to-free-for-all" class="btn_create" onclick="selectFFA()">FREE FOR ALL</button>
+                    </div>
+                    <script>
+                        const goToTeamsScoreboardButton = document.getElementById('go-to-select-teams');
+                        const goConfigureTeamsScoreboardButton = document.getElementById('go-to-free-for-all');
 
-                    goToTeamsScoreboardButton.disabled = true;
-                    goConfigureTeamsScoreboardButton.disabled = true;
-                </script>
+                        goToTeamsScoreboardButton.disabled = true;
+                        goConfigureTeamsScoreboardButton.disabled = true;
+                    </script>
+                </section>
                 
             <% } if (current_state === "scoreboard") { %>
                 <section id="partida">
