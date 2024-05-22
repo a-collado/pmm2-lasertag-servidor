@@ -24,7 +24,7 @@ const STATES = {
   END: "end",
 };
 
-const PERIODS = [60, 20, 30, 40, 50, 10, 70, 80, 90, 100, 110, 120, 130, 140];
+const PERIODS = [10, 20, 30, 40, 50];
 
 // Tiempo en ms que entre comprobaciones de conexion
 const RECONNECTION_TIME = 10000;
@@ -382,7 +382,7 @@ function findClosestPeriodIndex(number) {
       closestIndex = i;
     }
   }
-
+  console.log("Found closest distance: " + closestIndex);
   return closestIndex;
 }
 
@@ -458,12 +458,16 @@ function registerHitFFA(hitInformation) {
 function sendKill(pistola) {
   let topic_k = killTopic.concat(pistola);
   mqttClient.publish(topic_k, "kill");
+  console.log("Kill: " + pistola);
 }
 
 function setPeriods() {
   for (let index = 0; index < devices.length; index++) {
     let topic = periodTopic.concat(devices[index]);
     mqttClient.publish(topic, PERIODS[index].toString());
+    console.log(
+      topic + " : " + "pistola = " + index + "->" + PERIODS[index].toString(),
+    );
   }
 }
 
